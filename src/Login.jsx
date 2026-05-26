@@ -1,10 +1,10 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router";
-import axios from "axios";
+import api from "./api";
 
 export function Login() {
   const navigate = useNavigate();
-  const [email, setEmail] = useState("");
+  const [matricula, setMatricula] = useState(""); // Mudou de email para matricula
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState("");
@@ -15,11 +15,16 @@ export function Login() {
     setError("");
     setLoading(true);
     try {
-      const { data } = await axios.post("/api/auth/login", { email, password });
+      // Endpoint corrigido para "/auth/login" e enviando "matricula"
+      const { data } = await api.post("/auth/login", { 
+        matricula, 
+        senha: password // A API espera "senha" em português conforme o print
+      });
+      
       localStorage.setItem("token", data.token);
       navigate("/");
     } catch (err) {
-      setError(err.response?.data?.message || "E-mail ou senha inválidos");
+      setError(err.response?.data?.message || "Matrícula ou senha inválidos");
     } finally {
       setLoading(false);
     }
@@ -35,12 +40,12 @@ export function Login() {
 
         <form onSubmit={handleSubmit}>
           <div>
-            <label>E-mail</label>
+            <label>Matrícula</label>
             <input
-              type="email"
-              placeholder="seu@email.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              type="text"
+              placeholder="Digite sua matrícula"
+              value={matricula}
+              onChange={(e) => setMatricula(e.target.value)}
               required
             />
           </div>
