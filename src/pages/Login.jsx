@@ -26,7 +26,7 @@ export function Login() {
 
       localStorage.setItem("token", data.token);
 
-      navigate("/");
+      navigate("/Home");
     } catch (err) {
       setError(
         err.response?.data?.message ||
