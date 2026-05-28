@@ -8,16 +8,37 @@ export function Home() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
+  function extrairJogos(data) {
+    if (Array.isArray(data)) return data;
+    if (Array.isArray(data.itens)) return data.itens;
+    if (Array.isArray(data.jogos)) return data.jogos;
+    if (Array.isArray(data.destaques)) return data.destaques;
+    return [];
+  }
+
+  function extrairGenero(jogo) {
+    return (
+      jogo.genero?.nome ||
+      jogo.genero ||
+      jogo.generos?.map((genero) => genero.nome).join(", ") ||
+      jogo.categorias?.map((categoria) => categoria.nome).join(", ") ||
+      "Sem gênero"
+    );
+  }
+
   useEffect(() => {
     async function buscarJogos() {
       try {
-        const { data } = await api.get("/jogos?limite=100");
+        const respostaDestaques = await api.get("/jogos/destaques");
 
-        if (data && data.itens) {
-          setJogos(data.itens);
-        } else if (Array.isArray(data)) {
-          setJogos(data);
+        let listaJogos = extrairJogos(respostaDestaques.data);
+
+        if (listaJogos.length === 0) {
+          const respostaTodos = await api.get("/jogos?limite=100");
+          listaJogos = extrairJogos(respostaTodos.data);
         }
+
+        setJogos(listaJogos);
       } catch (err) {
         console.log(err);
         setError("Não foi possível carregar os jogos.");
@@ -44,11 +65,7 @@ export function Home() {
           </p>
         )}
 
-        {error && (
-          <p className="text-red-400">
-            {error}
-          </p>
-        )}
+        {error && <p className="text-red-400">{error}</p>}
 
         {!loading && !error && jogos.length === 0 && (
           <p>Nenhum jogo encontrado no servidor.</p>
@@ -71,7 +88,7 @@ export function Home() {
                 id: jogo.id,
                 nome: jogo.titulo,
                 foto: jogo.capaUrl,
-                genero: jogo.genero,
+                genero: extrairGenero(jogo),
               }}
             />
           ))}
