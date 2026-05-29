@@ -11,7 +11,6 @@ export function Header() {
 
   function handleLogout() {
     localStorage.removeItem("token");
-
     navigate("/login");
   }
 
@@ -23,25 +22,29 @@ export function Header() {
         left-0
         w-full
         z-50
-        border-b
-        border-cyan-400/10
         bg-[#020817]/95
         backdrop-blur-xl
+        border-b
+        border-cyan-400/10
       "
     >
       <div
         className="
           max-w-[1600px]
           mx-auto
-          px-8
           h-[82px]
+          px-8
           flex
           items-center
           justify-between
         "
       >
+        {/* LOGO + NAVEGAÇÃO */}
         <div className="flex items-center gap-12">
-          <Link to="/" className="flex items-center gap-4">
+          <Link
+            to="/loja"
+            className="flex items-center gap-4"
+          >
             <img
               src={logo}
               alt="KeySuina"
@@ -67,7 +70,7 @@ export function Header() {
 
           <nav className="flex items-center gap-8">
             <Link
-              to="/"
+              to="/loja"
               className="
                 text-slate-300
                 text-lg
@@ -104,139 +107,140 @@ export function Header() {
           </nav>
         </div>
 
-        <div className="relative">
-          {!token ? (
-            <div className="flex items-center gap-4">
-              <Link
-                to="/login"
-                className="
-                  rounded-2xl
-                  border
-                  border-cyan-400/20
-                  bg-[#0b1729]
-                  px-5
-                  py-2.5
-                  text-slate-200
-                  transition-all
-                  hover:border-cyan-300
-                  hover:text-white
-                "
-              >
-                Login
-              </Link>
+        {/* ÁREA DO USUÁRIO */}
+        {!token ? (
+          <div className="flex items-center gap-4">
+            <Link
+              to="/login"
+              className="
+                rounded-2xl
+                border
+                border-cyan-400/20
+                bg-[#0b1729]
+                px-5
+                py-2.5
+                text-slate-200
+                transition-all
+                hover:border-cyan-300
+                hover:text-white
+              "
+            >
+              Login
+            </Link>
 
-              <Link
-                to="/registro"
-                className="
-                    rounded-2xl
-                    bg-[#69c6f4]
-                    px-5
-                    py-2.5
-                  text-[#08111f]
-                    font-semibold
-                    transition-all
-                    hover:brightness-110
-                    hover:shadow-[0_0_18px_rgba(105,198,244,0.35)]
-                "
-              >
-                Registrar
-              </Link>
-            </div>
-          ) : (
-            <div className="relative">
-              <button
-                onClick={() => setMenuOpen(!menuOpen)}
+            <Link
+              to="/registro"
+              className="
+                rounded-2xl
+                bg-[#69c6f4]
+                px-5
+                py-2.5
+                text-[#08111f]
+                font-semibold
+                transition-all
+                hover:brightness-110
+                hover:shadow-[0_0_18px_rgba(105,198,244,0.35)]
+              "
+            >
+              Registrar
+            </Link>
+          </div>
+        ) : (
+          <div className="relative">
+            <button
+              onClick={() => setMenuOpen(!menuOpen)}
+              className="
+                flex
+                items-center
+                gap-3
+                rounded-2xl
+                border
+                border-cyan-400/10
+                bg-[#0b1729]
+                px-5
+                py-2.5
+                text-slate-200
+                transition-all
+                hover:border-cyan-300/30
+              "
+            >
+              <div
                 className="
                   flex
                   items-center
-                  gap-3
+                  justify-center
+                  h-10
+                  w-10
+                  rounded-full
+                  bg-cyan-400/20
+                  text-cyan-300
+                  text-lg
+                "
+              >
+                👤
+              </div>
+
+              <span className="text-lg">
+                Meu Perfil
+              </span>
+
+              <span
+                className={`transition-transform ${
+                  menuOpen ? "rotate-180" : ""
+                }`}
+              >
+                ▼
+              </span>
+            </button>
+
+            {menuOpen && (
+              <div
+                className="
+                  absolute
+                  right-0
+                  mt-3
+                  w-[220px]
+                  overflow-hidden
                   rounded-2xl
                   border
                   border-cyan-400/10
-                  bg-[#0b1729]
-                  px-5
-                  py-2.5
-                  text-slate-200
-                  transition-all
-                  hover:border-cyan-300/30
+                  bg-[#08111f]
+                  shadow-2xl
                 "
               >
-                <div
+                <Link
+                  to="/perfil"
                   className="
-                    flex
-                    items-center
-                    justify-center
-                    h-10
-                    w-10
-                    rounded-full
-                    bg-cyan-400/20
-                    text-cyan-300
-                    text-lg
+                    block
+                    px-5
+                    py-4
+                    text-slate-200
+                    transition-all
+                    hover:bg-cyan-400/10
+                  "
+                  onClick={() => setMenuOpen(false)}
+                >
+                  Meu Perfil
+                </Link>
+
+                <button
+                  onClick={handleLogout}
+                  className="
+                    w-full
+                    text-left
+                    px-5
+                    py-4
+                    text-red-300
+                    transition-all
+                    hover:bg-red-500/10
                   "
                 >
-                  👤
-                </div>
-
-                <span className="text-lg">Meu Perfil</span>
-
-                <span
-                  className={`
-                    transition-transform
-                    ${menuOpen ? "rotate-180" : ""}
-                  `}
-                >
-                  ▼
-                </span>
-              </button>
-
-              {menuOpen && (
-                <div
-                  className="
-                    absolute
-                    right-0
-                    mt-3
-                    w-[220px]
-                    overflow-hidden
-                    rounded-2xl
-                    border
-                    border-cyan-400/10
-                    bg-[#08111f]
-                    shadow-2xl
-                  "
-                >
-                  <Link
-                    to="/perfil"
-                    className="
-                      block
-                      px-5
-                      py-4
-                      text-slate-200
-                      transition-all
-                      hover:bg-cyan-400/10
-                    "
-                  >
-                    Meu Perfil
-                  </Link>
-
-                  <button
-                    onClick={handleLogout}
-                    className="
-                      w-full
-                      text-left
-                      px-5
-                      py-4
-                      text-red-300
-                      transition-all
-                      hover:bg-red-400/10
-                    "
-                  >
-                    Sair da Conta
-                  </button>
-                </div>
-              )}
-            </div>
-          )}
-        </div>
+                  Sair da Conta
+                </button>
+              </div>
+            )}
+          </div>
+        )}
       </div>
     </header>
   );

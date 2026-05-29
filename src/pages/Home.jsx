@@ -65,10 +65,16 @@ export function Home() {
           </p>
         )}
 
-        {error && <p className="text-red-400">{error}</p>}
+        {error && (
+          <p className="text-red-400">
+            {error}
+          </p>
+        )}
 
         {!loading && !error && jogos.length === 0 && (
-          <p>Nenhum jogo encontrado no servidor.</p>
+          <p className="text-slate-400">
+            Nenhum jogo encontrado no servidor.
+          </p>
         )}
 
         <div
@@ -81,17 +87,21 @@ export function Home() {
             gap-8
           "
         >
-          {jogos.map((jogo) => (
-            <CardJogos
-              key={jogo.id}
-              game={{
-                id: jogo.id,
-                nome: jogo.titulo,
-                foto: jogo.capaUrl,
-                genero: extrairGenero(jogo),
-              }}
-            />
-          ))}
+          {jogos.map((item) => {
+            const jogo = item.jogo || item;
+
+            return (
+              <CardJogos
+                key={jogo.id}
+                game={{
+                  id: jogo.id,
+                  nome: jogo.titulo,
+                  foto: jogo.capaUrl,
+                  genero: extrairGenero(jogo),
+                }}
+              />
+            );
+          })}
         </div>
       </main>
     </div>

@@ -18,23 +18,30 @@ export function Login() {
     setError("");
     setLoading(true);
 
-    try {
-      const { data } = await api.post("/auth/login", {
-        matricula,
-        senha: password,
-      });
+try {
+  const { data } = await api.post("/auth/login", {
+    matricula,
+    senha: password,
+  });
 
-      localStorage.setItem("token", data.token);
+  console.log("Resposta do login:", data);
 
-      navigate("/Home");
-    } catch (err) {
-      setError(
-        err.response?.data?.message ||
-          "Matrícula ou senha inválidos"
-      );
-    } finally {
-      setLoading(false);
-    }
+  const token = data.token || data.accessToken || data.jwt;
+
+  if (!token) {
+    setError("Login realizado, mas o token não foi encontrado.");
+    return;
+  }
+
+  localStorage.setItem("token", token);
+
+  navigate("/loja");
+} catch (err) {
+  setError(
+    err.response?.data?.message ||
+      "Matrícula ou senha inválidos"
+  );
+}
   };
 
   return (
