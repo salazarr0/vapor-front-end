@@ -39,7 +39,7 @@ export function Header() {
           justify-between
         "
       >
-        {/* LOGO + NAVEGAÇÃO */}
+
         <div className="flex items-center gap-12">
           <Link
             to="/loja"
@@ -107,7 +107,6 @@ export function Header() {
           </nav>
         </div>
 
-        {/* ÁREA DO USUÁRIO */}
         {!token ? (
           <div className="flex items-center gap-4">
             <Link
