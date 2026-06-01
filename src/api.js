@@ -10,7 +10,6 @@ api.interceptors.request.use((config) => {
   if (token) {
     config.headers.Authorization = `Bearer ${token}`;
 
-    // Alguns backends usam headers alternativos
     config.headers["x-access-token"] = token;
     config.headers["x-token"] = token;
     config.headers.token = token;

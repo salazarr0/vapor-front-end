@@ -5,6 +5,7 @@ import { Header } from "../components/Header";
 
 export function Home() {
   const [jogos, setJogos] = useState([]);
+  const [biblioteca, setBiblioteca] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -24,6 +25,22 @@ export function Home() {
       jogo.categorias?.map((categoria) => categoria.nome).join(", ") ||
       "Sem gênero"
     );
+  }
+
+  async function buscarBiblioteca() {
+    try {
+      const token = localStorage.getItem("token");
+
+      if (!token) return;
+
+      const { data } = await api.get("/biblioteca/me");
+
+      const ids = data.map((item) => item.jogoId || item.jogo?.id || item.id);
+
+      setBiblioteca(ids);
+    } catch (err) {
+      console.log(err);
+    }
   }
 
   useEffect(() => {
@@ -48,6 +65,7 @@ export function Home() {
     }
 
     buscarJogos();
+    buscarBiblioteca();
   }, []);
 
   return (
@@ -65,11 +83,7 @@ export function Home() {
           </p>
         )}
 
-        {error && (
-          <p className="text-red-400">
-            {error}
-          </p>
-        )}
+        {error && <p className="text-red-400">{error}</p>}
 
         {!loading && !error && jogos.length === 0 && (
           <p className="text-slate-400">
@@ -77,16 +91,7 @@ export function Home() {
           </p>
         )}
 
-        <div
-          className="
-            grid
-            grid-cols-1
-            sm:grid-cols-2
-            md:grid-cols-3
-            lg:grid-cols-4
-            gap-8
-          "
-        >
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
           {jogos.map((item) => {
             const jogo = item.jogo || item;
 
@@ -99,6 +104,8 @@ export function Home() {
                   foto: jogo.capaUrl,
                   genero: extrairGenero(jogo),
                 }}
+                estaNaBiblioteca={biblioteca.includes(jogo.id)}
+                atualizarBiblioteca={buscarBiblioteca}
               />
             );
           })}

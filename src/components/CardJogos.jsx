@@ -1,8 +1,13 @@
 import { Link } from "react-router-dom";
+import toast from "react-hot-toast";
 import api from "../api";
 import logo from "../assets/SuinoPrime.png";
 
-export function CardJogos({ game }) {
+export function CardJogos({
+  game,
+  estaNaBiblioteca,
+  atualizarBiblioteca,
+}) {
   const imagemPadrao = logo;
 
   const imagemValida =
@@ -14,28 +19,41 @@ export function CardJogos({ game }) {
     try {
       const token = localStorage.getItem("token");
 
-      console.log("TOKEN:", token);
-      console.log("ID DO JOGO:", game.id);
-
       if (!token) {
-        alert("Você precisa estar logado.");
+        toast.error("Você precisa estar logado.");
         return;
       }
 
-      const resposta = await api.post(`/biblioteca/${game.id}`);
+      await api.post(`/biblioteca/${game.id}`);
 
-      console.log("RESPOSTA BIBLIOTECA:", resposta.data);
+      toast.success("Jogo adicionado à biblioteca!");
 
-      alert("Jogo adicionado à biblioteca!");
+      atualizarBiblioteca();
     } catch (err) {
-      console.log("ERRO COMPLETO:", err);
-      console.log("STATUS:", err.response?.status);
-      console.log("DADOS:", err.response?.data);
+      console.log(err);
 
-      alert(
+      toast.error(
         err.response?.data?.message ||
           err.response?.data?.erro ||
           "Não foi possível adicionar o jogo."
+      );
+    }
+  }
+
+  async function removerBiblioteca() {
+    try {
+      await api.delete(`/biblioteca/${game.id}`);
+
+      toast.success("Jogo removido da biblioteca!");
+
+      atualizarBiblioteca();
+    } catch (err) {
+      console.log(err);
+
+      toast.error(
+        err.response?.data?.message ||
+          err.response?.data?.erro ||
+          "Não foi possível remover o jogo."
       );
     }
   }
@@ -74,12 +92,21 @@ export function CardJogos({ game }) {
             Ver Detalhes
           </Link>
 
-          <button
-            onClick={adicionarBiblioteca}
-            className="w-full rounded-2xl border border-cyan-400/20 bg-[#0b1729] py-3 text-cyan-300 font-semibold transition-all hover:border-cyan-300 hover:bg-cyan-400/10"
-          >
-            Adicionar à Biblioteca
-          </button>
+          {estaNaBiblioteca ? (
+            <button
+              onClick={removerBiblioteca}
+              className="w-full rounded-2xl border border-red-400/30 bg-red-500/10 py-3 text-red-300 font-semibold transition-all hover:bg-red-500/20 hover:text-red-200"
+            >
+              Remover da Biblioteca
+            </button>
+          ) : (
+            <button
+              onClick={adicionarBiblioteca}
+              className="w-full rounded-2xl border border-cyan-400/20 bg-[#0b1729] py-3 text-cyan-300 font-semibold transition-all hover:border-cyan-300 hover:bg-cyan-400/10"
+            >
+              Adicionar à Biblioteca
+            </button>
+          )}
         </div>
       </div>
     </div>
