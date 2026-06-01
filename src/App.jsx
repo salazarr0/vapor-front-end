@@ -5,6 +5,7 @@ import { Home } from "./pages/Home";
 import { Loja } from "./pages/Loja";
 import { Registro } from "./pages/Registro";
 import { Biblioteca } from "./pages/Biblioteca";
+import { GameDetalhes } from "./pages/GameDetalhes";
 
 function App() {
   return (
@@ -27,6 +28,7 @@ function App() {
         <Route path="/home" element={<Home />} />
         <Route path="/registro" element={<Registro />} />
         <Route path="/biblioteca" element={<Biblioteca />} />
+        <Route path="/game/:id" element={<GameDetalhes />} />
       </Routes>
     </BrowserRouter>
   );
