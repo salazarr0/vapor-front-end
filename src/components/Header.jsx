@@ -39,7 +39,6 @@ export function Header() {
           justify-between
         "
       >
-
         <div className="flex items-center gap-12">
           <Link
             to="/loja"
@@ -180,7 +179,7 @@ export function Header() {
               </div>
 
               <span className="text-lg">
-                Meu Perfil
+                Minha Conta
               </span>
 
               <span
@@ -208,7 +207,7 @@ export function Header() {
                 "
               >
                 <Link
-                  to="/perfil"
+                  to="/meus-jogos"
                   className="
                     block
                     px-5
@@ -219,7 +218,7 @@ export function Header() {
                   "
                   onClick={() => setMenuOpen(false)}
                 >
-                  Meu Perfil
+                  🎮 Meus Jogos
                 </Link>
 
                 <button
@@ -234,7 +233,7 @@ export function Header() {
                     hover:bg-red-500/10
                   "
                 >
-                  Sair da Conta
+                  🚪 Sair da Conta
                 </button>
               </div>
             )}
