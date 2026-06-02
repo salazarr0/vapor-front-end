@@ -1,25 +1,28 @@
 import { useEffect, useState } from "react";
 import api from "../api";
 
-export function ModalJogo({ onClose, onSubmit }) {
-  const [titulo, setTitulo] = useState("");
-  const [descricao, setDescricao] = useState("");
-  const [desenvolvedora, setDesenvolvedora] = useState("");
-  const [lancamento, setLancamento] = useState("");
-  const [capaUrl, setCapaUrl] = useState("");
+export function ModalJogo({ onClose, onSubmit, jogoEditando }) {
+  const [titulo, setTitulo] = useState(jogoEditando?.titulo || "");
+  const [descricao, setDescricao] = useState(jogoEditando?.descricao || "");
+  const [desenvolvedora, setDesenvolvedora] = useState(
+    jogoEditando?.desenvolvedora || ""
+  );
+  const [lancamento, setLancamento] = useState(
+    jogoEditando?.lancamento
+      ? jogoEditando.lancamento.split("T")[0]
+      : ""
+  );
+  const [capaUrl, setCapaUrl] = useState(jogoEditando?.capaUrl || "");
   const [generos, setGeneros] = useState([]);
-  const [generosSelecionados, setGenerosSelecionados] = useState([]);
+  const [generoIds, setGeneroIds] = useState(
+    jogoEditando?.generos?.map((g) => g.id) || []
+  );
 
   useEffect(() => {
     async function buscarGeneros() {
       try {
         const { data } = await api.get("/generos");
-
-        if (Array.isArray(data)) {
-          setGeneros(data);
-        } else if (Array.isArray(data.itens)) {
-          setGeneros(data.itens);
-        }
+        setGeneros(Array.isArray(data) ? data : data.itens || []);
       } catch (err) {
         console.log(err);
       }
@@ -29,13 +32,11 @@ export function ModalJogo({ onClose, onSubmit }) {
   }, []);
 
   function alternarGenero(id) {
-    if (generosSelecionados.includes(id)) {
-      setGenerosSelecionados(
-        generosSelecionados.filter((generoId) => generoId !== id)
-      );
-    } else {
-      setGenerosSelecionados([...generosSelecionados, id]);
-    }
+    setGeneroIds((atual) =>
+      atual.includes(id)
+        ? atual.filter((generoId) => generoId !== id)
+        : [...atual, id]
+    );
   }
 
   function handleSubmit(e) {
@@ -47,21 +48,21 @@ export function ModalJogo({ onClose, onSubmit }) {
       desenvolvedora,
       lancamento,
       capaUrl,
-      generoIds: generosSelecionados,
+      generoIds,
     });
   }
 
   return (
     <div className="fixed inset-0 z-[999] flex items-center justify-center bg-[#020817]/80 backdrop-blur-sm px-4 py-8">
-      <div className="w-full max-w-[720px] max-h-[90vh] overflow-y-auto rounded-3xl border border-cyan-400/10 bg-[#08111f] shadow-2xl">
+      <div className="w-full max-w-[760px] max-h-[90vh] overflow-y-auto rounded-3xl border border-cyan-400/10 bg-[#08111f] shadow-2xl">
         <div className="sticky top-0 z-10 flex items-center justify-between px-8 py-6 border-b border-cyan-400/10 bg-[#08111f]">
           <h2 className="text-3xl font-light text-white">
-            Criar novo jogo
+            {jogoEditando ? "Editar jogo" : "Criar novo jogo"}
           </h2>
 
           <button
             onClick={onClose}
-            className="text-slate-400 text-3xl hover:text-white"
+            className="text-slate-400 text-3xl hover:text-white transition-colors"
           >
             ×
           </button>
@@ -107,9 +108,7 @@ export function ModalJogo({ onClose, onSubmit }) {
             </div>
 
             <div>
-              <label className="block text-slate-300 mb-3">
-                Lançamento
-              </label>
+              <label className="block text-slate-300 mb-3">Lançamento</label>
               <input
                 type="date"
                 value={lancamento}
@@ -121,9 +120,7 @@ export function ModalJogo({ onClose, onSubmit }) {
           </div>
 
           <div>
-            <label className="block text-slate-300 mb-3">
-              URL da capa
-            </label>
+            <label className="block text-slate-300 mb-3">URL da capa</label>
             <input
               type="url"
               placeholder="https://exemplo.com/capa.jpg"
@@ -143,11 +140,11 @@ export function ModalJogo({ onClose, onSubmit }) {
               {generos.map((genero) => (
                 <label
                   key={genero.id}
-                  className="flex items-center gap-3 rounded-2xl border border-cyan-400/10 bg-[#0b1729] px-4 py-3 text-slate-300 cursor-pointer hover:border-cyan-300/30"
+                  className="flex items-center gap-3 rounded-2xl border border-cyan-400/10 bg-[#0b1729] px-4 py-3 text-slate-300 cursor-pointer hover:border-cyan-300/30 transition-all"
                 >
                   <input
                     type="checkbox"
-                    checked={generosSelecionados.includes(genero.id)}
+                    checked={generoIds.includes(genero.id)}
                     onChange={() => alternarGenero(genero.id)}
                     className="h-4 w-4 accent-cyan-300"
                   />
@@ -162,16 +159,16 @@ export function ModalJogo({ onClose, onSubmit }) {
             <button
               type="button"
               onClick={onClose}
-              className="rounded-2xl px-8 py-4 text-slate-300 font-semibold hover:text-white"
+              className="rounded-2xl px-8 py-4 text-slate-300 font-semibold hover:text-white transition-colors"
             >
               Cancelar
             </button>
 
             <button
               type="submit"
-              className="rounded-2xl bg-[#69c6f4] px-12 py-4 text-[#08111f] font-semibold hover:brightness-110"
+              className="rounded-2xl bg-[#69c6f4] px-12 py-4 text-[#08111f] font-semibold transition-all hover:brightness-110 hover:shadow-[0_0_20px_rgba(105,198,244,0.35)]"
             >
-              Criar
+              {jogoEditando ? "Salvar alterações" : "Criar"}
             </button>
           </div>
         </form>
