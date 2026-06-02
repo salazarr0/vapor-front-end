@@ -64,7 +64,7 @@ export function MeusJogos() {
       setJogoEditando(null);
       buscarJogos();
     } catch (err) {
-      console.log(err);
+      alert(JSON.stringify(err.response?.data, null, 2));
 
       toast.error(
         err.response?.data?.message ||
@@ -149,19 +149,19 @@ export function MeusJogos() {
           )}
 
           {!loading &&
-            jogos.map((jogo) => ( 
+            jogos.map((jogo) => (
               <div
                 key={jogo.id}
                 className="grid grid-cols-[120px_1fr_1fr_1fr_1fr_160px] items-center px-6 py-5 border-b border-cyan-400/10 hover:bg-cyan-400/5 transition-all"
               >
-              <img
-                src={jogo.capaUrl || logo}
-                alt={jogo.titulo}
-                onError={(e) => {
-                  e.currentTarget.src = logo;
-                }}
-                className="h-24 w-20 rounded-xl object-cover bg-[#020817]"
-              />
+                <img
+                  src={jogo.capaUrl || logo}
+                  alt={jogo.titulo}
+                  onError={(e) => {
+                    e.currentTarget.src = logo;
+                  }}
+                  className="h-24 w-20 rounded-xl object-cover bg-[#020817]"
+                />
 
                 <span className="text-white">{jogo.titulo}</span>
 

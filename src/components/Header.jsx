@@ -218,7 +218,7 @@ export function Header() {
                   "
                   onClick={() => setMenuOpen(false)}
                 >
-                  🎮 Meus Jogos
+                  Meus Jogos
                 </Link>
 
                 <button
@@ -233,7 +233,7 @@ export function Header() {
                     hover:bg-red-500/10
                   "
                 >
-                  🚪 Sair da Conta
+                  Sair da Conta
                 </button>
               </div>
             )}

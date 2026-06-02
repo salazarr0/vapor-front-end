@@ -8,11 +8,10 @@ export function ModalJogo({ onClose, onSubmit, jogoEditando }) {
     jogoEditando?.desenvolvedora || ""
   );
   const [lancamento, setLancamento] = useState(
-    jogoEditando?.lancamento
-      ? jogoEditando.lancamento.split("T")[0]
-      : ""
+    jogoEditando?.lancamento ? jogoEditando.lancamento.split("T")[0] : ""
   );
   const [capaUrl, setCapaUrl] = useState(jogoEditando?.capaUrl || "");
+  const [preco, setPreco] = useState(jogoEditando?.preco || "");
   const [generos, setGeneros] = useState([]);
   const [generoIds, setGeneroIds] = useState(
     jogoEditando?.generos?.map((g) => g.id) || []
@@ -42,14 +41,17 @@ export function ModalJogo({ onClose, onSubmit, jogoEditando }) {
   function handleSubmit(e) {
     e.preventDefault();
 
-    onSubmit({
+    const payload = {
       titulo,
       descricao,
       desenvolvedora,
-      lancamento,
+      lancamento: new Date(lancamento).toISOString(),
+      preco: Number(preco),
       capaUrl,
       generoIds,
-    });
+    };
+
+    onSubmit(payload);
   }
 
   return (
@@ -61,6 +63,7 @@ export function ModalJogo({ onClose, onSubmit, jogoEditando }) {
           </h2>
 
           <button
+            type="button"
             onClick={onClose}
             className="text-slate-400 text-3xl hover:text-white transition-colors"
           >
@@ -117,6 +120,20 @@ export function ModalJogo({ onClose, onSubmit, jogoEditando }) {
                 className="w-full h-[56px] rounded-2xl border border-cyan-400/20 bg-[#0b1729] px-5 text-white outline-none focus:border-cyan-300 focus:ring-4 focus:ring-cyan-400/10"
               />
             </div>
+          </div>
+
+          <div>
+            <label className="block text-slate-300 mb-3">Preço</label>
+            <input
+              type="number"
+              step="0.01"
+              min="0"
+              placeholder="Ex: 59.90"
+              value={preco}
+              onChange={(e) => setPreco(e.target.value)}
+              required
+              className="w-full h-[56px] rounded-2xl border border-cyan-400/20 bg-[#0b1729] px-5 text-white placeholder:text-slate-500 outline-none focus:border-cyan-300 focus:ring-4 focus:ring-cyan-400/10"
+            />
           </div>
 
           <div>

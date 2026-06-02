@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import api from "../api";
 import { CardJogos } from "../components/CardJogos";
 import { Header } from "../components/Header";
+import { CarrosselDestaques } from "../components/CarrosselDestaques";
 
 export function Home() {
   const [jogos, setJogos] = useState([]);
@@ -68,12 +69,26 @@ export function Home() {
     buscarBiblioteca();
   }, []);
 
+  const jogosTratados = jogos.map((item) => {
+    const jogo = item.jogo || item;
+
+    return {
+      id: jogo.id,
+      nome: jogo.titulo,
+      descricao: jogo.descricao,
+      foto: jogo.capaUrl,
+      genero: extrairGenero(jogo),
+    };
+  });
+
   return (
     <div className="min-h-screen bg-[#020817] text-white">
       <Header />
 
-      <main className="pt-[120px] px-8">
-        <h2 className="text-3xl font-light mb-10">
+      <main className="px-8 pt-[110px] pb-10">
+        <CarrosselDestaques jogos={jogosTratados} />
+
+        <h2 className="text-3xl font-light mb-8">
           Jogos Disponíveis ({jogos.length})
         </h2>
 
@@ -92,23 +107,14 @@ export function Home() {
         )}
 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
-          {jogos.map((item) => {
-            const jogo = item.jogo || item;
-
-            return (
-              <CardJogos
-                key={jogo.id}
-                game={{
-                  id: jogo.id,
-                  nome: jogo.titulo,
-                  foto: jogo.capaUrl,
-                  genero: extrairGenero(jogo),
-                }}
-                estaNaBiblioteca={biblioteca.includes(jogo.id)}
-                atualizarBiblioteca={buscarBiblioteca}
-              />
-            );
-          })}
+          {jogosTratados.map((jogo) => (
+            <CardJogos
+              key={jogo.id}
+              game={jogo}
+              estaNaBiblioteca={biblioteca.includes(jogo.id)}
+              atualizarBiblioteca={buscarBiblioteca}
+            />
+          ))}
         </div>
       </main>
     </div>
