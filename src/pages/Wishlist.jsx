@@ -20,20 +20,37 @@ export function Wishlist() {
     return (
       jogo.genero?.nome ||
       jogo.genero ||
-      jogo.generos?.map((g) => g.nome).join(", ") ||
+      jogo.generos?.map((genero) => genero.nome).join(", ") ||
+      jogo.categorias?.map((categoria) => categoria.nome).join(", ") ||
       "Sem gênero"
     );
   }
 
-  function tratarJogo(item) {
-    const jogo = item.jogo || item;
+  async function buscarDetalhesDoJogo(item) {
+    const jogoBase = item.jogo || item;
+    const jogoId = jogoBase.id || item.jogoId;
 
-    return {
-      id: jogo.id || item.jogoId,
-      nome: jogo.titulo,
-      foto: jogo.capaUrl,
-      genero: extrairGenero(jogo),
-    };
+    try {
+      const { data } = await api.get(`/jogos/${jogoId}`);
+
+      return {
+        id: data.id,
+        nome: data.titulo,
+        foto: data.capaUrl,
+        genero: extrairGenero(data),
+        generos: data.generos || [],
+      };
+    } catch (err) {
+      console.log("Erro ao buscar detalhes do jogo:", err);
+
+      return {
+        id: jogoId,
+        nome: jogoBase.titulo || "Jogo sem título",
+        foto: jogoBase.capaUrl,
+        genero: extrairGenero(jogoBase),
+        generos: jogoBase.generos || [],
+      };
+    }
   }
 
   async function buscarWishlist() {
@@ -43,7 +60,12 @@ export function Wishlist() {
 
       const { data } = await api.get("/wishlist/me");
 
-      const lista = extrairJogos(data).map(tratarJogo);
+      const itensWishlist = extrairJogos(data);
+
+      const lista = await Promise.all(
+        itensWishlist.map((item) => buscarDetalhesDoJogo(item))
+      );
+
       setJogos(lista);
     } catch (err) {
       console.log(err);
@@ -62,14 +84,18 @@ export function Wishlist() {
       <Header />
 
       <main className="pt-[120px] px-8">
-        <h1 className="text-4xl font-light mb-2">Minha Wishlist</h1>
+        <h1 className="text-4xl font-light mb-2">
+          Minha Wishlist
+        </h1>
 
         <p className="text-slate-400 mb-10">
           Jogos que você deseja comprar futuramente.
         </p>
 
         {loading && (
-          <p className="text-slate-400">Carregando wishlist...</p>
+          <p className="text-slate-400">
+            Carregando wishlist...
+          </p>
         )}
 
         {error && <p className="text-red-400">{error}</p>}

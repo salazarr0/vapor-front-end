@@ -9,6 +9,13 @@ export function CardWishlist({ game, onAtualizar }) {
     !game.foto.includes("example.com") &&
     !game.foto.includes("chatgpt.com");
 
+  const textoGenero =
+    game.generos?.length > 0
+      ? game.generos.map((g) => g.nome).join(", ")
+      : game.genero?.nome ||
+        game.genero ||
+        "Sem gênero";
+
   async function adicionarBiblioteca() {
     try {
       await api.post(`/biblioteca/${game.id}`);
@@ -57,7 +64,7 @@ export function CardWishlist({ game, onAtualizar }) {
         </h2>
 
         <p className="text-slate-400 text-sm mb-5">
-          {game.genero || "Sem gênero"}
+          {textoGenero}
         </p>
 
         <div className="flex flex-col gap-3">
@@ -86,4 +93,3 @@ export function CardWishlist({ game, onAtualizar }) {
     </div>
   );
 }
-

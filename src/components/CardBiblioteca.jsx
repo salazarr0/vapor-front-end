@@ -9,6 +9,13 @@ export function CardBiblioteca({ game, onRemover }) {
     !game.foto.includes("example.com") &&
     !game.foto.includes("chatgpt.com");
 
+  const textoGenero =
+    game.generos?.length > 0
+      ? game.generos.map((g) => g.nome).join(", ")
+      : game.genero?.nome ||
+        game.genero ||
+        "Sem gênero";
+
   return (
     <div className="group overflow-hidden rounded-3xl bg-[#08111f]/95 border border-cyan-400/10 shadow-[0_0_25px_rgba(56,189,248,0.08)] transition-all duration-500 hover:-translate-y-2 hover:border-cyan-300/40">
       <div className="relative h-[260px] bg-[#020817] overflow-hidden">
@@ -30,7 +37,7 @@ export function CardBiblioteca({ game, onRemover }) {
         </h2>
 
         <p className="text-slate-400 text-sm mb-5">
-          {game.genero || "Sem gênero"}
+          {textoGenero}
         </p>
 
         <div className="flex flex-col gap-3">

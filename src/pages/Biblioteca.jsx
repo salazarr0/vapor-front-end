@@ -16,20 +16,41 @@ export function Biblioteca() {
     return [];
   }
 
-  function tratarJogo(item) {
-    const jogo = item.jogo || item;
+  function extrairGenero(jogo) {
+    return (
+      jogo.genero?.nome ||
+      jogo.genero ||
+      jogo.generos?.map((genero) => genero.nome).join(", ") ||
+      jogo.categorias?.map((categoria) => categoria.nome).join(", ") ||
+      "Sem gênero"
+    );
+  }
 
-    return {
-      id: jogo.id,
-      nome: jogo.titulo,
-      foto: jogo.capaUrl,
-      genero:
-        jogo.genero?.nome ||
-        jogo.genero ||
-        jogo.generos?.map((genero) => genero.nome).join(", ") ||
-        jogo.categorias?.map((categoria) => categoria.nome).join(", ") ||
-        "Sem gênero",
-    };
+  async function buscarDetalhesDoJogo(item) {
+    const jogoBase = item.jogo || item;
+    const jogoId = jogoBase.id || item.jogoId;
+
+    try {
+      const { data } = await api.get(`/jogos/${jogoId}`);
+
+      return {
+        id: data.id,
+        nome: data.titulo,
+        foto: data.capaUrl,
+        genero: extrairGenero(data),
+        generos: data.generos || [],
+      };
+    } catch (err) {
+      console.log("Erro ao buscar detalhes do jogo:", err);
+
+      return {
+        id: jogoId,
+        nome: jogoBase.titulo || "Jogo sem título",
+        foto: jogoBase.capaUrl,
+        genero: extrairGenero(jogoBase),
+        generos: jogoBase.generos || [],
+      };
+    }
   }
 
   async function buscarBiblioteca() {
@@ -37,22 +58,17 @@ export function Biblioteca() {
       setLoading(true);
       setError("");
 
-      const token = localStorage.getItem("token");
-
-      console.log("TOKEN:", token);
-
       const { data } = await api.get("/biblioteca/me");
 
-      console.log("BIBLIOTECA:", data);
+      const itensBiblioteca = extrairJogos(data);
 
-      const lista = extrairJogos(data).map(tratarJogo);
+      const lista = await Promise.all(
+        itensBiblioteca.map((item) => buscarDetalhesDoJogo(item))
+      );
 
       setJogos(lista);
     } catch (err) {
-      console.log("ERRO COMPLETO:", err);
-      console.log("STATUS:", err.response?.status);
-      console.log("DADOS:", err.response?.data);
-
+      console.log(err);
       setError("Não foi possível carregar sua biblioteca.");
     } finally {
       setLoading(false);
@@ -61,18 +77,13 @@ export function Biblioteca() {
 
   async function removerDaBiblioteca(id) {
     try {
-      const resposta = await api.delete(`/biblioteca/${id}`);
-
-      console.log("REMOVIDO:", resposta.data);
+      await api.delete(`/biblioteca/${id}`);
 
       setJogos((jogosAtuais) =>
         jogosAtuais.filter((jogo) => jogo.id !== id)
       );
     } catch (err) {
-      console.log("ERRO AO REMOVER:", err);
-      console.log("STATUS:", err.response?.status);
-      console.log("DADOS:", err.response?.data);
-
+      console.log(err);
       alert("Não foi possível remover o jogo da biblioteca.");
     }
   }
