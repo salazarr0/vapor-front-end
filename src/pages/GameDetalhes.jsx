@@ -4,6 +4,7 @@ import api from "../api";
 import { Header } from "../components/Header";
 import { DetalhesJogo } from "../components/DetalhesJogo";
 import { SecaoReviews } from "../components/SecaoReviews";
+import { SecaoConquistas } from "../components/SecaoConquistas";
 
 export function GameDetalhes() {
   const { id } = useParams();
@@ -11,8 +12,11 @@ export function GameDetalhes() {
 
   const [jogo, setJogo] = useState(null);
   const [reviews, setReviews] = useState([]);
+  const [conquistas, setConquistas] = useState([]);
+
   const [loadingJogo, setLoadingJogo] = useState(true);
   const [loadingReviews, setLoadingReviews] = useState(true);
+  const [loadingConquistas, setLoadingConquistas] = useState(true);
   const [errorJogo, setErrorJogo] = useState("");
 
   const [nota, setNota] = useState(8);
@@ -21,7 +25,6 @@ export function GameDetalhes() {
   const [enviando, setEnviando] = useState(false);
   const [erroCriar, setErroCriar] = useState("");
   const [jaReviewou, setJaReviewou] = useState(false);
-
   const [naWishlist, setNaWishlist] = useState(false);
 
   const token = localStorage.getItem("token");
@@ -67,6 +70,25 @@ export function GameDetalhes() {
       setReviews([]);
     } finally {
       setLoadingReviews(false);
+    }
+  }
+
+  async function buscarConquistas() {
+    try {
+      setLoadingConquistas(true);
+
+      const { data } = await api.get(`/jogos/${id}/conquistas`);
+
+      const lista = Array.isArray(data)
+        ? data
+        : data.conquistas || data.itens || [];
+
+      setConquistas(lista);
+    } catch (err) {
+      console.log(err);
+      setConquistas([]);
+    } finally {
+      setLoadingConquistas(false);
     }
   }
 
@@ -147,6 +169,7 @@ export function GameDetalhes() {
   useEffect(() => {
     buscarJogo();
     buscarReviews();
+    buscarConquistas();
     verificarWishlist();
   }, [id]);
 
@@ -173,16 +196,10 @@ export function GameDetalhes() {
 
       <main className="pt-[120px] px-8 max-w-[1200px] mx-auto pb-20">
         {loadingJogo && (
-          <p className="text-slate-400">
-            Carregando jogo...
-          </p>
+          <p className="text-slate-400">Carregando jogo...</p>
         )}
 
-        {errorJogo && (
-          <p className="text-red-400">
-            {errorJogo}
-          </p>
-        )}
+        {errorJogo && <p className="text-red-400">{errorJogo}</p>}
 
         {jogo && (
           <>
@@ -193,6 +210,13 @@ export function GameDetalhes() {
               percentRecomenda={percentRecomenda}
               naWishlist={naWishlist}
               alternarWishlist={alternarWishlist}
+            />
+
+            <SecaoConquistas
+              jogoId={id}
+              conquistas={conquistas}
+              loadingConquistas={loadingConquistas}
+              buscarConquistas={buscarConquistas}
             />
 
             <SecaoReviews

@@ -48,6 +48,12 @@ export function DetalhesJogo({
           </p>
         )}
 
+        {jogo.preco !== undefined && (
+          <p className="text-3xl font-semibold text-cyan-300">
+            R$ {Number(jogo.preco).toFixed(2).replace(".", ",")}
+          </p>
+        )}
+
         <button
           onClick={alternarWishlist}
           className="
