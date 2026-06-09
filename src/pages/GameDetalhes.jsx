@@ -5,6 +5,7 @@ import { Header } from "../components/Header";
 import { DetalhesJogo } from "../components/DetalhesJogo";
 import { SecaoReviews } from "../components/SecaoReviews";
 import { SecaoConquistas } from "../components/SecaoConquistas";
+import { SecaoMidia } from "../components/SecaoMidia";
 
 export function GameDetalhes() {
   const { id } = useParams();
@@ -13,10 +14,14 @@ export function GameDetalhes() {
   const [jogo, setJogo] = useState(null);
   const [reviews, setReviews] = useState([]);
   const [conquistas, setConquistas] = useState([]);
+  const [imagens, setImagens] = useState([]);
+  const [videos, setVideos] = useState([]);
 
   const [loadingJogo, setLoadingJogo] = useState(true);
   const [loadingReviews, setLoadingReviews] = useState(true);
   const [loadingConquistas, setLoadingConquistas] = useState(true);
+  const [loadingImagens, setLoadingImagens] = useState(true);
+  const [loadingVideos, setLoadingVideos] = useState(true);
   const [errorJogo, setErrorJogo] = useState("");
 
   const [nota, setNota] = useState(8);
@@ -42,9 +47,14 @@ export function GameDetalhes() {
 
   async function buscarJogo() {
     try {
+      setLoadingJogo(true);
+      setErrorJogo("");
+
       const { data } = await api.get(`/jogos/${id}`);
+
       setJogo(data);
-    } catch {
+    } catch (err) {
+      console.log(err);
       setErrorJogo("Não foi possível carregar o jogo.");
     } finally {
       setLoadingJogo(false);
@@ -64,9 +74,12 @@ export function GameDetalhes() {
       setReviews(lista);
 
       if (usuarioId) {
-        setJaReviewou(lista.some((review) => review.autorId === usuarioId));
+        setJaReviewou(
+          lista.some((review) => review.autorId === usuarioId)
+        );
       }
-    } catch {
+    } catch (err) {
+      console.log(err);
       setReviews([]);
     } finally {
       setLoadingReviews(false);
@@ -92,6 +105,44 @@ export function GameDetalhes() {
     }
   }
 
+  async function buscarImagens() {
+    try {
+      setLoadingImagens(true);
+
+      const { data } = await api.get(`/jogos/${id}/imagens`);
+
+      const lista = Array.isArray(data)
+        ? data
+        : data.imagens || data.itens || [];
+
+      setImagens(lista);
+    } catch (err) {
+      console.log(err);
+      setImagens([]);
+    } finally {
+      setLoadingImagens(false);
+    }
+  }
+
+  async function buscarVideos() {
+    try {
+      setLoadingVideos(true);
+
+      const { data } = await api.get(`/jogos/${id}/videos`);
+
+      const lista = Array.isArray(data)
+        ? data
+        : data.videos || data.itens || [];
+
+      setVideos(lista);
+    } catch (err) {
+      console.log(err);
+      setVideos([]);
+    } finally {
+      setLoadingVideos(false);
+    }
+  }
+
   async function verificarWishlist() {
     try {
       if (!token) return;
@@ -104,6 +155,7 @@ export function GameDetalhes() {
 
       const existe = lista.some((item) => {
         const jogoWishlist = item.jogo || item;
+
         return Number(jogoWishlist.id || item.jogoId) === Number(id);
       });
 
@@ -170,6 +222,8 @@ export function GameDetalhes() {
     buscarJogo();
     buscarReviews();
     buscarConquistas();
+    buscarImagens();
+    buscarVideos();
     verificarWishlist();
   }, [id]);
 
@@ -196,10 +250,16 @@ export function GameDetalhes() {
 
       <main className="pt-[120px] px-8 max-w-[1200px] mx-auto pb-20">
         {loadingJogo && (
-          <p className="text-slate-400">Carregando jogo...</p>
+          <p className="text-slate-400">
+            Carregando jogo...
+          </p>
         )}
 
-        {errorJogo && <p className="text-red-400">{errorJogo}</p>}
+        {errorJogo && (
+          <p className="text-red-400">
+            {errorJogo}
+          </p>
+        )}
 
         {jogo && (
           <>
@@ -210,6 +270,16 @@ export function GameDetalhes() {
               percentRecomenda={percentRecomenda}
               naWishlist={naWishlist}
               alternarWishlist={alternarWishlist}
+            />
+
+            <SecaoMidia
+              jogoId={id}
+              imagens={imagens}
+              videos={videos}
+              loadingImagens={loadingImagens}
+              loadingVideos={loadingVideos}
+              buscarImagens={buscarImagens}
+              buscarVideos={buscarVideos}
             />
 
             <SecaoConquistas
