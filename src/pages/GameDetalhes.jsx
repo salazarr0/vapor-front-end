@@ -31,6 +31,7 @@ export function GameDetalhes() {
   const [erroCriar, setErroCriar] = useState("");
   const [jaReviewou, setJaReviewou] = useState(false);
   const [naWishlist, setNaWishlist] = useState(false);
+  const [souAutor, setSouAutor] = useState(false);
 
   const token = localStorage.getItem("token");
 
@@ -53,6 +54,10 @@ export function GameDetalhes() {
       const { data } = await api.get(`/jogos/${id}`);
 
       setJogo(data);
+
+      if (usuarioId) {
+        setSouAutor(Number(data.autorId) === Number(usuarioId));
+      }
     } catch (err) {
       console.log(err);
       setErrorJogo("Não foi possível carregar o jogo.");
@@ -75,7 +80,7 @@ export function GameDetalhes() {
 
       if (usuarioId) {
         setJaReviewou(
-          lista.some((review) => review.autorId === usuarioId)
+          lista.some((review) => Number(review.autorId) === Number(usuarioId))
         );
       }
     } catch (err) {
@@ -276,6 +281,9 @@ export function GameDetalhes() {
               <GaleriaMidia
                 imagens={imagens}
                 videos={videos}
+                souAutor={souAutor}
+                buscarImagens={buscarImagens}
+                buscarVideos={buscarVideos}
               />
             )}
 
