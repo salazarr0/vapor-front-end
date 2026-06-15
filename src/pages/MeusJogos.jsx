@@ -50,26 +50,46 @@ export function MeusJogos() {
     }
   }
 
-  async function salvarJogo(dadosJogo) {
+  async function salvarJogo(dadosFormulario) {
+    const { jogo, imagens, videos } = dadosFormulario;
+
     try {
+      let jogoId;
+
       if (jogoEditando) {
-        await api.patch(`/jogos/${jogoEditando.id}`, dadosJogo);
+        await api.patch(`/jogos/${jogoEditando.id}`, jogo);
+        jogoId = jogoEditando.id;
+
         toast.success("Jogo editado com sucesso!");
       } else {
-        await api.post("/jogos", dadosJogo);
+        const { data } = await api.post("/jogos", jogo);
+        jogoId = data.id;
+
         toast.success("Jogo criado com sucesso!");
+      }
+
+      for (const url of imagens) {
+        await api.post(`/jogos/${jogoId}/imagens`, { url });
+      }
+
+      for (const url of videos) {
+        await api.post(`/jogos/${jogoId}/videos`, { url });
       }
 
       setModalAberto(false);
       setJogoEditando(null);
       buscarJogos();
     } catch (err) {
+      console.log("ERRO COMPLETO:", err);
+      console.log("STATUS:", err.response?.status);
+      console.log("RESPOSTA DA API:", err.response?.data);
+
       alert(JSON.stringify(err.response?.data, null, 2));
 
       toast.error(
         err.response?.data?.message ||
           err.response?.data?.erro ||
-          "Não foi possível salvar o jogo.",
+          "Não foi possível salvar o jogo."
       );
     }
   }
@@ -87,7 +107,7 @@ export function MeusJogos() {
       toast.error(
         err.response?.data?.message ||
           err.response?.data?.erro ||
-          "Não foi possível remover o jogo.",
+          "Não foi possível remover o jogo."
       );
     }
   }

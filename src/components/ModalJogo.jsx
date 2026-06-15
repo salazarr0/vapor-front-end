@@ -17,6 +17,9 @@ export function ModalJogo({ onClose, onSubmit, jogoEditando }) {
     jogoEditando?.generos?.map((g) => g.id) || []
   );
 
+  const [imagensTexto, setImagensTexto] = useState("");
+  const [videosTexto, setVideosTexto] = useState("");
+
   useEffect(() => {
     async function buscarGeneros() {
       try {
@@ -38,17 +41,28 @@ export function ModalJogo({ onClose, onSubmit, jogoEditando }) {
     );
   }
 
+  function transformarTextoEmLista(texto) {
+    return texto
+      .split("\n")
+      .map((url) => url.trim())
+      .filter((url) => url.length > 0);
+  }
+
   function handleSubmit(e) {
     e.preventDefault();
 
     const payload = {
-      titulo,
-      descricao,
-      desenvolvedora,
-      lancamento: new Date(lancamento).toISOString(),
-      preco: Number(preco),
-      capaUrl,
-      generoIds,
+      jogo: {
+        titulo,
+        descricao,
+        desenvolvedora,
+        lancamento: new Date(lancamento).toISOString(),
+        preco: Number(preco),
+        capaUrl,
+        generoIds,
+      },
+      imagens: transformarTextoEmLista(imagensTexto),
+      videos: transformarTextoEmLista(videosTexto),
     };
 
     onSubmit(payload);
@@ -56,7 +70,7 @@ export function ModalJogo({ onClose, onSubmit, jogoEditando }) {
 
   return (
     <div className="fixed inset-0 z-[999] flex items-center justify-center bg-[#020817]/80 backdrop-blur-sm px-4 py-8">
-      <div className="w-full max-w-[760px] max-h-[90vh] overflow-y-auto rounded-3xl border border-cyan-400/10 bg-[#08111f] shadow-2xl">
+      <div className="w-full max-w-[800px] max-h-[90vh] overflow-y-auto rounded-3xl border border-cyan-400/10 bg-[#08111f] shadow-2xl">
         <div className="sticky top-0 z-10 flex items-center justify-between px-8 py-6 border-b border-cyan-400/10 bg-[#08111f]">
           <h2 className="text-3xl font-light text-white">
             {jogoEditando ? "Editar jogo" : "Criar novo jogo"}
@@ -170,6 +184,32 @@ export function ModalJogo({ onClose, onSubmit, jogoEditando }) {
                 </label>
               ))}
             </div>
+          </div>
+
+          <div>
+            <label className="block text-slate-300 mb-3">
+              Imagens adicionais
+            </label>
+            <textarea
+              placeholder="Cole uma URL de imagem por linha"
+              value={imagensTexto}
+              onChange={(e) => setImagensTexto(e.target.value)}
+              rows={4}
+              className="w-full rounded-2xl border border-cyan-400/20 bg-[#0b1729] p-5 text-white placeholder:text-slate-500 outline-none resize-none focus:border-cyan-300 focus:ring-4 focus:ring-cyan-400/10"
+            />
+          </div>
+
+          <div>
+            <label className="block text-slate-300 mb-3">
+              Vídeos adicionais
+            </label>
+            <textarea
+              placeholder="Cole uma URL de vídeo por linha"
+              value={videosTexto}
+              onChange={(e) => setVideosTexto(e.target.value)}
+              rows={4}
+              className="w-full rounded-2xl border border-cyan-400/20 bg-[#0b1729] p-5 text-white placeholder:text-slate-500 outline-none resize-none focus:border-cyan-300 focus:ring-4 focus:ring-cyan-400/10"
+            />
           </div>
 
           <div className="flex items-center justify-end gap-5 pt-4">

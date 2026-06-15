@@ -5,7 +5,7 @@ import { Header } from "../components/Header";
 import { DetalhesJogo } from "../components/DetalhesJogo";
 import { SecaoReviews } from "../components/SecaoReviews";
 import { SecaoConquistas } from "../components/SecaoConquistas";
-import { SecaoMidia } from "../components/SecaoMidia";
+import { GaleriaMidia } from "../components/GaleriaMidia";
 
 export function GameDetalhes() {
   const { id } = useParams();
@@ -272,15 +272,12 @@ export function GameDetalhes() {
               alternarWishlist={alternarWishlist}
             />
 
-            <SecaoMidia
-              jogoId={id}
-              imagens={imagens}
-              videos={videos}
-              loadingImagens={loadingImagens}
-              loadingVideos={loadingVideos}
-              buscarImagens={buscarImagens}
-              buscarVideos={buscarVideos}
-            />
+            {!loadingImagens && !loadingVideos && (
+              <GaleriaMidia
+                imagens={imagens}
+                videos={videos}
+              />
+            )}
 
             <SecaoConquistas
               jogoId={id}
