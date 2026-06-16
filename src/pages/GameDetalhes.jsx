@@ -34,6 +34,7 @@ export function GameDetalhes() {
   const [souAutor, setSouAutor] = useState(false);
 
   const token = localStorage.getItem("token");
+  const usuarioLocal = JSON.parse(localStorage.getItem("usuario"));
 
   function decodificarToken(tk) {
     try {
@@ -44,7 +45,11 @@ export function GameDetalhes() {
   }
 
   const payload = token ? decodificarToken(token) : null;
-  const usuarioId = payload?.id || payload?.userId || payload?.sub;
+  const usuarioId =
+    payload?.id ||
+    payload?.userId ||
+    payload?.sub ||
+    usuarioLocal?.id;
 
   async function buscarJogo() {
     try {
@@ -55,9 +60,11 @@ export function GameDetalhes() {
 
       setJogo(data);
 
-      if (usuarioId) {
-        setSouAutor(Number(data.autorId) === Number(usuarioId));
-      }
+      setSouAutor(
+        Number(data.autorId) === Number(usuarioId) ||
+          Number(data.autor?.id) === Number(usuarioId) ||
+          Number(data.usuarioId) === Number(usuarioId)
+      );
     } catch (err) {
       console.log(err);
       setErrorJogo("Não foi possível carregar o jogo.");
@@ -80,7 +87,9 @@ export function GameDetalhes() {
 
       if (usuarioId) {
         setJaReviewou(
-          lista.some((review) => Number(review.autorId) === Number(usuarioId))
+          lista.some(
+            (review) => Number(review.autorId) === Number(usuarioId)
+          )
         );
       }
     } catch (err) {
